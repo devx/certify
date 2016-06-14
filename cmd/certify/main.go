@@ -41,18 +41,22 @@ func reqClientCert() bool {
 
 	hostname, _ := os.Hostname()
 
+	cert := ""
+
 	switch *certType {
 	case "client":
-		if _, err := os.Stat(fmt.Sprintf("%s/%s.pem", *dir, *certName)); err == nil {
-			if !*force {
+		cert = fmt.Sprintf("%s/%s", *dir, *certName)
+		if _, err := os.Stat(fmt.Sprintf("%s.pem", cert)); err == nil {
+			if *force {
 				fmt.Println("File already exists exiting")
 				os.Exit(0)
 			}
 		}
 		jsonStr = fmt.Sprintf("{ \"profile\": \"%s\", \"request\": { \"CN\": \"%s\", \"hosts\": [\"\"], \"key\": { \"algo\": \"rsa\", \"size\": 2048 }, \"names\": [ { \"C\": \"US\", \"L\": \"San Antonio\", \"O\": \"test\", \"OU\": \"kumoru.org\", \"ST\": \"Texas\" } ] } } ", *certType, *certName)
 	case "server", "client-server":
-		if _, err := os.Stat(fmt.Sprintf("%s/%s.pem", *dir, hostname)); err == nil {
-			if !*force {
+		cert = fmt.Sprintf("%s/%s.pem", *dir, hostname)
+		if _, err := os.Stat(fmt.Sprintf("%s.pem", cert)); err == nil {
+			if *force {
 				fmt.Println("File already exists exiting")
 				os.Exit(0)
 			}
@@ -80,7 +84,7 @@ func reqClientCert() bool {
 		pass = *password
 	}
 
-	if !strings.Contains("https", *url) {
+	if strings.Contains("https", *url) {
 		fmt.Println("Please provide an https url")
 		os.Exit(1)
 	}
@@ -102,16 +106,20 @@ func reqClientCert() bool {
 	defer resp.Body.Close()
 
 	r := new(CfsslResponse)
+
+	fmt.Printf("resp: %+v\n\n\n\n", resp)
+	fmt.Printf("err: %+v\n\n\n", err)
+	fmt.Printf("r: %+v\n\n\n\n", r)
+
 	if err = json.Unmarshal(body, &r); err != nil {
 		log.Fatal("Failed to generage CFSLL Certificate")
 	}
 
-	fmt.Printf("CFSSL response: %+v\n", r)
-
-	if err := ioutil.WriteFile("/etc/certificates/client.pem", []byte(r.Result.Certificate), 0644); err != nil {
+	fmt.Printf("writing CFSSL certs: %+v\n", r)
+	if err := ioutil.WriteFile(fmt.Sprintf("%s.pem", cert), []byte(r.Result.Certificate), 0644); err != nil {
 		return false
 	}
-	if err := ioutil.WriteFile("/etc/certificates/client-key.pem", []byte(r.Result.PrivateKey), 0644); err != nil {
+	if err := ioutil.WriteFile(fmt.Sprintf("%s-key.pem", cert), []byte(r.Result.PrivateKey), 0644); err != nil {
 		return false
 	}
 
@@ -145,7 +153,7 @@ func getCAcert() error {
 	body, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
-	return ioutil.WriteFile("/etc/certificates/ca.pem", body, 0644)
+	return ioutil.WriteFile(fmt.Sprintf("%s/ca.pem", *dir), body, 0644)
 
 }
 

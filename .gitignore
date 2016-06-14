@@ -1,3 +1,4 @@
 docker-compose.env
 cmd/mediatord/certify
-builds/Darwin/certify
+builds/Darwin/*
+builds/Linux/*
