@@ -29,15 +29,15 @@ import (
 )
 
 var (
-	caCertURL = flag.String("ca_cert_url", "", "Specify an url where to downlaod the CA's certificate")
-	certName  = flag.String("name", "", "Only used for client certificates, for server and client-server we use the hostname as the identifier.")
-	certType  = flag.String("type", "client-server", "The certificatle type to request: server, client, client-server")
-	dir       = flag.String("dir", "/etc/certificates", "directory where to store the certificates")
-	force     = flag.Bool("force", false, "If certificates exist, overwrite them by requesting new certificates (default: false)")
-	password  = flag.String("password", "", "password to use for basic auth")
-	url       = flag.String("url", "https://localhost", "CFSSL URL")
-	username  = flag.String("user", "", "user name to use for basic auth")
-	skipSSL   = flag.Bool("skipSSL", false, "Verify certificate chain (default: false)")
+	caURL    = flag.String("caURL", "", "Specify an url where to downlaod the CA's certificate")
+	certName = flag.String("name", "", "Only used for client certificates, for server and client-server we use the hostname as the identifier.")
+	certType = flag.String("type", "client-server", "The certificatle type to request: server, client, client-server")
+	dir      = flag.String("dir", "/etc/certificates", "directory where to store the certificates")
+	force    = flag.Bool("force", false, "If certificates exist, overwrite them by requesting new certificates (default: false)")
+	password = flag.String("password", "", "password to use for basic auth")
+	skipSSL  = flag.Bool("skipSSL", false, "Verify certificate chain (default: false)")
+	url      = flag.String("url", "https://localhost", "CFSSL URL")
+	username = flag.String("user", "", "user name to use for basic auth")
 )
 
 func main() {
@@ -147,22 +147,22 @@ func basicAuth() (string, string) {
 }
 
 func getCAcert() error {
-	caURL := ""
+	caURLstr := ""
 
 	if os.Getenv("CA_CERT_URL") != "" {
-		caURL = os.Getenv("CA_CERT_URL")
+		caURLstr = os.Getenv("CA_CERT_URL")
 	}
 
-	if *caCertURL != "" {
-		caURL = *caCertURL
+	if *caURL != "" {
+		caURLstr = *caURL
 
 	}
 
-	if caURL == "" {
+	if caURLstr == "" {
 		return nil
 	}
 
-	resp, err := http.Get(os.Getenv("CA_CERT_URL")) // TODO: Replace host with variable
+	resp, err := http.Get(caURLstr) // TODO: Replace host with variable
 	if err != nil {
 		panic(err.Error())
 	}
