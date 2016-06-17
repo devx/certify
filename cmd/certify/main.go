@@ -54,8 +54,12 @@ func reqClientCert() bool {
 	cert, JSONstr := buildCertReq()
 
 	log.Println("Requesting New certificates")
-	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/cfssl/newcert", *url),
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/cfssl/newcert", *url),
 		bytes.NewBuffer([]byte(JSONstr)))
+
+	if err != nil {
+		log.Fatalf("Error requesting new certificate: %s", err)
+	}
 
 	user, pass := basicAuth()
 	if user != "" {
@@ -89,9 +93,11 @@ func reqClientCert() bool {
 	}
 
 	if err := ioutil.WriteFile(fmt.Sprintf("%s.pem", cert), []byte(r.Result.Certificate), 0644); err != nil {
+		log.Fatalf("Error writing file: %s", err)
 		return false
 	}
 	if err := ioutil.WriteFile(fmt.Sprintf("%s-key.pem", cert), []byte(r.Result.PrivateKey), 0644); err != nil {
+		log.Fatalf("Error writing file: %s", err)
 		return false
 	}
 
