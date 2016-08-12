@@ -33,7 +33,6 @@ type Config struct {
 	CAURL    string
 	CertName string
 	CertType string
-	Force    bool
 	Password string
 	SkipSSL  bool
 	URL      string

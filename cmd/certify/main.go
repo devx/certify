@@ -27,7 +27,8 @@ import (
 
 type cliConfig struct {
 	certify.Config
-	Dir string
+	Dir   string
+	Force bool
 }
 
 var config cliConfig
