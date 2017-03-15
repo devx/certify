@@ -1,4 +1,4 @@
-#Certify
+# Certify
 A small utility that will request certificates from CFSSL and write the certificates to a specific directory.
 ```
 certify -h 
@@ -25,7 +25,7 @@ Usage of certify:
 
 ```
 
-#How to use:
+# How to use:
 Request a client and if certificates exist overwrite them. 
 ```
 certify -dir $(pwd) -name client-test -user USER -password SUPER_SECRET_PASSWORD -url https://my.certiciate.ca  -type client -force true 
@@ -37,8 +37,8 @@ Request a server certificate it will use the hostname as the CN ie: myserver.exa
 certify -dir $(pwd) -name client-test -user USER -password SUPER_SECRET_PASSWORD -url https://my.certiciate.ca  -type server
 ```
 
-#Notes:
+# Notes:
 To make this more generic some things need to be changed.
-##TODO:
+## TODO:
  - [ ] make certificate properties load from a config file or environment variables
  - [ ] add test
